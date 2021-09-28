@@ -9,13 +9,21 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var chequeAmount = ""
-    @State private var numberOfPeople = 0
+    @State private var numberOfPeople = ""
     @State private var tipPercentage = 2
     
-    
     let tipPercentages = [10, 15, 20, 25, 0]
+    
+    var totalAmountWithTip: Double {
+        let orderAmount = Double(chequeAmount) ?? 0
+        let tipAmount = orderAmount * Double(tipPercentages[tipPercentage])/100
+
+        let totalAmountWithTips = orderAmount + tipAmount
+        
+        return totalAmountWithTips
+    }
     var totalPerPerson: Double {
-        let peopleCount = Double(numberOfPeople + 2)
+        let peopleCount = Double(numberOfPeople) ?? 0
         let tipSelection = Double(tipPercentages[tipPercentage]) / 100
         let orderAmount = Double(chequeAmount) ?? 0
         
@@ -30,11 +38,13 @@ struct ContentView: View {
                 Section{
                     TextField("ChequeAmount", text: $chequeAmount)
                         .keyboardType(.decimalPad)
-                    Picker("Number of People", selection: $numberOfPeople){
-                        ForEach(2 ..< 100) {
-                            Text("\($0) people")
-                        }
-                    }
+                    TextField("Number of People", text: $numberOfPeople)
+                        .keyboardType(.numberPad)
+//                    Picker("Number of People", selection: $numberOfPeople){
+//                        ForEach(2 ..< 100) {
+//                            Text("\($0) people")
+//                        }
+//                    }
                 }
                 Section (header: Text("How much tip would you like to leave?")) {
                     Picker("Tip Percentage", selection: $tipPercentage) {
@@ -45,9 +55,14 @@ struct ContentView: View {
                     .pickerStyle(SegmentedPickerStyle())
                 }
                 .textCase(nil)
-                Section{
+                Section (header: Text("Order Total With Tip")){
+                    Text("$\(totalAmountWithTip, specifier: "%.2f")")
+                }
+                .textCase(nil)
+                Section (header: Text("Amount Per Person")){
                     Text("$\(totalPerPerson, specifier: "%.2f")")
                 }
+                .textCase(nil)
             }
             .navigationTitle("Tip Calculator")
         }
